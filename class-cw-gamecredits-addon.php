@@ -347,14 +347,10 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 		 */
 		public function processing_config( $pc_conf, $currency, $options ) {
 			if ( $this->get_currency_code() === $currency ) {
-				if ( 'gamecredits.network' === $options[ $this->get_processing_api_id() ] ) {
-					$pc_conf['min_conf'] = 1;
-				} else {
-					$min_conf_id  = "cryptowoo_{$this->get_currency_short_name()}_min_conf";
-					$zero_conf_id = "cryptowoo_{$this->get_currency_short_name()}_raw_zeroconf";
-					// Maybe accept "raw" zeroconf.
-					$pc_conf['min_confidence'] = isset( $options[ $min_conf_id ] ) && 0 === (int) $options[ $min_conf_id ] && isset( $options[ $zero_conf_id ] ) && (bool) $options[ $zero_conf_id ] ? 0 : $pc_conf['min_confidence'];
-				}
+				$min_conf_id  = "cryptowoo_{$this->get_currency_short_name()}_min_conf";
+				$zero_conf_id = "cryptowoo_{$this->get_currency_short_name()}_raw_zeroconf";
+				// Maybe accept "raw" zeroconf.
+				$pc_conf['min_confidence'] = isset( $options[ $min_conf_id ] ) && 0 === (int) $options[ $min_conf_id ] && isset( $options[ $zero_conf_id ] ) && (bool) $options[ $zero_conf_id ] ? 0 : $pc_conf['min_confidence'];
 			}
 
 			return $pc_conf;
@@ -504,7 +500,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 
 
 				// Check if data is valid. There is only an incoming payment if address exist.
-				if ( ! isset( $batch_data[ $this->get_currency_code() ] ) || ! is_object( $batch_data[ $this->get_currency_code() ] ) ) {
+				if ( ! isset( $batch_data[ $this->get_currency_code() ] ) || ! is_object( $batch_data[ $this->get_currency_code() ] ) && 'address not found.' !== $batch_data[ $this->get_currency_code() ] ) {
 					// TODO: Change to new CryptoWoo logging function (in an upcoming update).
 				    file_put_contents( CW_LOG_DIR . 'cryptowoo-tx-update.log', date( 'Y-m-d H:i:s' ) . " {$processing->tx_update_api} full address error_invalid_result\r\n", FILE_APPEND );
 					return array();
@@ -598,6 +594,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				return 'Could not find transaction data from block explorer api';
 			}
 
+			// Get extra transaction information and format transaction data.
 			foreach ( $result->transactions as & $transaction ) {
 				// Get tx confirmations.
 				if ( 'blockexplorer.gamecredits.org' === $api_url ) {
@@ -627,31 +624,32 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 						return 'Could not find tx confirmations from block explorer api result';
 					}
 					unset( $response[0]->confirmations );
+
+					if ( isset( $transaction->vout ) ) {
+						foreach ( $transaction->vout as & $vout ) {
+							$vout->scriptPubKey            = new stdClass();
+							$vout->scriptPubKey->addresses = $vout->addresses;
+							unset( $vout->addresses );
+						}
+					} else {
+						return 'Could not find transaction outputs data from block explorer api';
+					}
 				} elseif ( 'gamecredits.network' === $api_url ) {
-					// We cannot check confirmations in this block explorer?.
-					// That Iquidus block explorer returns a result means it has at least 1 confirm.
-					// TODO: Calculate confirms, maybe by comparing block height to tx's block height?
-					$transaction->confirmations = 1;
+					// Get data for transaction from bock explorer api.
+					$txid     = $transaction->addresses;
+					$api_path = 'api/getrawtransaction';
+					$url      = "http://{$api_url}/$api_path?txid=$txid&decrypt=1";
+
+					$tx_result   = wp_safe_remote_get( $url );
+					$transaction = json_decode( $tx_result['body'] );
 				}
 
 				// Format or add timestamp.
-				$transaction->time = isset( $transaction->blocktime ) ? $transaction->blocktime : time();
+				isset( $transaction->time ) ?: $transaction->time = isset( $transaction->blocktime ) ? $transaction->blocktime : time();
+			}
 
-				// Format transaction outputs.
-				if ( isset( $transaction->vout ) ) {
-					foreach ( $transaction->vout as & $vout ) {
-						$vout->scriptPubKey            = new stdClass();
-						$vout->scriptPubKey->addresses = $vout->addresses;
-					}
-				} elseif ( isset( $transaction->type ) && 'vout' === $transaction->type ) {
-					$vout                          = new stdClass();
-					$vout->scriptPubKey            = new stdClass();
-					$vout->scriptPubKey->addresses = [ $result->address ];
-					$vout->value                   = $result->received;
-					$transaction->vout[]           = $vout;
-				} else {
-					return 'Could not find transaction outputs data from block explorer api';
-				}
+			if ( empty( $result->transactions ) ) {
+				return 'Could not find transaction data from block explorer api';
 			}
 
 			// Delete rate limit transient if the last call was successful.
@@ -967,9 +965,6 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'min'        => 0,
 				'step'       => 1,
 				'max'        => 100,
-				'required'   => array(
-					array( $this->get_processing_api_id(), 'equals', 'blockexplorer.gamecredits.org' ),
-				),
 			) );
 
 			// Enable raw zeroconf.
@@ -982,26 +977,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'desc'       => sprintf( __( '%sThis practice is generally not recommended. Only enable this if you know what you are doing!%s', 'cryptowoo' ), '<strong>', '</strong>' ),
 				'default'    => false,
 				'required'   => array(
-					array( $this->get_processing_api_id(), 'equals', 'blockexplorer.gamecredits.org' ),
 					array( "cryptowoo_{$this->get_currency_short_name()}_min_conf", '=', 0 ),
-				),
-			) );
-
-			/*
-			 * Required confirmations with gamecredits.network.
-			 */
-			Redux::setField( 'cryptowoo_payments', array(
-				'section_id' => 'processing-confirmations',
-				'id'         => "cryptowoo_{$this->get_currency_short_name()}_min_conf_1_only",
-				'type'       => 'spinner',
-				'title'      => sprintf( __( '%s Minimum Confirmations', 'cryptowoo' ), $this->get_currency_code() ),
-				'desc'       => sprintf( __( 'Minimum number of confirmations for <strong>%s</strong> transactions - %s Confirmation Threshold', 'cryptowoo' ), $this->get_currency_code(), $this->get_currency_code() ),
-				'default'    => 1,
-				'min'        => 1,
-				'step'       => 1,
-				'max'        => 1,
-				'required'   => array(
-					array( $this->get_processing_api_id(), 'equals', 'gamecredits.network' ),
 				),
 			) );
 
@@ -1042,7 +1018,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'subtitle'          => sprintf( __( 'Choose the API provider you want to use to look up %s payments.', 'cryptowoo' ), $this->get_currency_code() ),
 				'options'           => array(
 					'blockexplorer.gamecredits.org' => 'blockexplorer.gamecredits.org',
-					'gamecredits.network'           => 'gamecredits.network (1 confirm only)',
+					'gamecredits.network'           => 'gamecredits.network',
 					'custom'                        => 'Custom (insight)',
 					'disabled'                      => 'Disabled',
 				),
