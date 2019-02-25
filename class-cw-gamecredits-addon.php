@@ -960,7 +960,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'id'         => "cryptowoo_{$this->get_currency_short_name()}_min_conf",
 				'type'       => 'spinner',
 				'title'      => sprintf( __( '%s Minimum Confirmations', 'cryptowoo' ), $this->get_currency_code() ),
-				'desc'       => sprintf( __( 'Minimum number of confirmations for <strong>%s</strong> transactions - %s Confirmation Threshold', 'cryptowoo' ), $this->get_currency_code(), $this->get_currency_code() ),
+				'desc'       => sprintf( __( 'Minimum number of confirmations for <strong>%s</strong> transactions - %s Confirmation Threshold', 'cryptowoo' ), $this->get_currency_name(), $this->get_currency_code() ),
 				'default'    => 1,
 				'min'        => 0,
 				'step'       => 1,
@@ -1107,7 +1107,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'id'                => "preferred_exchange_{$this->get_currency_short_name()}",
 				'type'              => 'select',
 				'title'             => "{$this->get_currency_name()} Exchange ({$this->get_currency_code()}/BTC)",
-				'subtitle'          => sprintf( __( "Choose the exchange you prefer to use to calculate the %s{$this->get_currency_code()}to Bitcoin exchange rate%s", 'cryptowoo' ), '<strong>', '</strong>.' ),
+				'subtitle'          => sprintf( __( "Choose the exchange you prefer to use to calculate the %s{$this->get_currency_name()} to Bitcoin exchange rate%s", 'cryptowoo' ), '<strong>', '</strong>.' ),
 				'desc'              => sprintf( __( 'Cross-calculated via BTC/%s', 'cryptowoo' ), $woocommerce_currency ),
 				'options'           => array(
 					'poloniex' => 'Poloniex',
@@ -1251,7 +1251,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'id'                => "derivation_path_{$this->get_currency_short_name()}",
 				'type'              => 'select',
 				'subtitle'          => '',
-				'title'             => sprintf( __( '%s Derivation Path', 'cryptowoo-hd-wallet-addon' ), $this->get_currency_name() ),
+				'title'             => sprintf( __( '%s Derivation Path', 'cryptowoo-hd-wallet-addon' ), $this->get_currency_code() ),
 				'desc'              => __( 'Change the derivation path to match the derivation path of your wallet client.', 'cryptowoo-hd-wallet-addon' ),
 				'validate_callback' => 'redux_validate_derivation_path',
 				'options'           => array(
