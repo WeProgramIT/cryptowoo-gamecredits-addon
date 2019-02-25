@@ -108,28 +108,28 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 		/**
 		 * Display CryptoWoo HD Wallet addon not installed notice
 		 */
-		private function cw_hd_addon_not_installed_notice() {
+		public function cw_hd_addon_not_installed_notice() {
 			$this->addon_not_installed_notice( 'CryptoWoo HD Wallet Add-on' );
 		}
 
 		/**
 		 * Display CryptoWoo not installed notice
 		 */
-		private function cw_not_installed_notice() {
+		public function cw_not_installed_notice() {
 			$this->addon_not_installed_notice( 'CryptoWoo' );
 		}
 
 		/**
 		 * Display CryptoWoo HD Wallet addon inactive notice
 		 */
-		private function cw_hd_addon_inactive_notice() {
+		public function cw_hd_addon_inactive_notice() {
 			$this->addon_inactive_notice( 'CryptoWoo HD Wallet Add-on' );
 		}
 
 		/**
 		 * Display CryptoWoo inactive notice
 		 */
-		private function cw_inactive_notice() {
+		public function cw_inactive_notice() {
 			$this->addon_inactive_notice( 'CryptoWoo' );
 		}
 
