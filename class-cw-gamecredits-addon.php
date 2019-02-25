@@ -2,6 +2,7 @@
 /**
  * Plugin Name: GameCredits CryptoWoo Add-on
  * Plugin URI: https://github.com/WeProgramIT/cryptowoo-gamecredits-addon
+ * GitHub Plugin URI: WeProgramIT/cryptowoo-gamecredits-addon
  * Description: Accept GameCredits payments in WooCommerce. Requires CryptoWoo main plugin and CryptoWoo HD Wallet Add-on.
  * Version: 1.0.1
  * Author: We Program IT | legal company name: OS IT Programming AS | Company org nr: NO 921 074 077

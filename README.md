@@ -12,6 +12,10 @@ Accept payments in GameCredits in WooCommerce with CryptoWoo.
 2. Upload plugin in wordpress admin -> plugins.
 3. Activate plugin.
 
+## Updates
+To get updates directly in Wordpress admin panel, you need [GitHub updater](https://github.com/afragen/github-updater).  
+Download it here: https://github.com/afragen/github-updater/releases/latest
+
 # About Us
 This plugin was developed by [We Program IT](https://weprogram.it)
 
