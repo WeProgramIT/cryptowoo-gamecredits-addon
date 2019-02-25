@@ -1,4 +1,4 @@
-# CryptoWoo GameCredits Add-on
+# GameCredits CryptoWoo Add-on
 Accept payments in GameCredits in WooCommerce with CryptoWoo.
 
 ## Requirements
