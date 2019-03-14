@@ -1196,7 +1196,7 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 			 * Currency Switcher plugin decimals
 			 */
 			Redux::setField( 'cryptowoo_payments', array(
-				'section_id' => 'rewriting-switcher',
+				'section_id' => 'pricing-decimals',
 				'id'         => "decimals_{$this->get_currency_code()}",
 				'type'       => 'select',
 				'title'      => sprintf( __( '%s amount decimals', 'cryptowoo' ), $this->get_currency_code() ),
