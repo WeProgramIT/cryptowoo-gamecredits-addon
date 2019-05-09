@@ -139,17 +139,18 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 		 * @param string $addon_name Addon name.
 		 */
 		private function addon_inactive_notice( string $addon_name ) {
+			$this->require_cw_admin_notice();
+
 			$addon_id = strtolower( str_replace( [ 'CryptoWoo', ' ' ], [ 'cw', '_' ], $addon_name ) );
 
 			CW_Admin_Notice::generate( CW_Admin_Notice::NOTICE_ERROR )
 			->add_message( "{$this->get_plugin_name()} " . __( 'error' ) )
 			->add_message( "$addon_name " . __( 'plugin is inactive' ) )
 			->add_message( __( 'Activate the addon and go to the CryptoWoo checkout settings to make sure the settings are correct.' ) )
-			->add_button( __( 'Go to' ) . ' CryptoWoo ' . __( 'settings' ), __( 'Go to' ) . ' CryptoWoo ' . __( 'settings' ), 'cryptowoo' )
-			->make_dismissible( "{$this->get_currency_short_name()}_{$addon_id}_not_installed" )
+			->add_button_plugin_activate( __( 'Activate', 'cryptowoo' ) . ' CryptoWoo ' . __( 'Payment Gateway', 'cryptowoo' ), __( 'Activate', 'cryptowoo' ) . ' CryptoWoo ' . __( 'Payment Gateway', 'cryptowoo' ), 'cryptowoo' )
+			->make_dismissible( "{$this->get_currency_short_name()}_{$addon_id}_not_active" )
 			->print();
 		}
-
 
 		/** Display CryptoWoo HD Wallet add-on not installed notice
 		 *
@@ -157,12 +158,25 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 		 * TODO: Add link to CryptoWoo and HD Wallet Addon.
 		 */
 		private function addon_not_installed_notice( string $addon_name ) {
+			$this->require_cw_admin_notice();
+
 			CW_Admin_Notice::generate( CW_Admin_Notice::NOTICE_ERROR )
 			->add_message( "{$this->get_plugin_name()} " . __( 'error' ) )
 			->add_message( "$addon_name " . __( 'plugin has not been installed' ) )
 			->add_message( "{$this->get_plugin_name()} " . __( 'will only work in combination with' ) . " $addon_name." )
 			->make_dismissible( "{$this->get_currency_short_name()}_hd_wallet_not_installed" )
 			->print();
+		}
+
+		/** Require CW_Admin_Notice class */
+		private function require_cw_admin_notice() {
+			if ( ! class_exists( CW_Admin_Notice::class ) ) {
+				if ( ! $this->plugin_is_installed( 'cryptowoo' ) ) {
+					require_once __DIR__ . 'admin/class-cw-admin-notice.php';
+				}
+
+				require_once WP_PLUGIN_DIR . '/cryptowoo/admin/class.cw-admin-notice.php';
+			}
 		}
 
 		/**
