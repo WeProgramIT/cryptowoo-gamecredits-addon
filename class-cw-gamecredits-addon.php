@@ -1125,8 +1125,9 @@ if ( ! class_exists( CW_GameCredits_Addon::class ) ) {
 				'subtitle'          => sprintf( __( "Choose the exchange you prefer to use to calculate the %s{$this->get_currency_name()} to Bitcoin exchange rate%s", 'cryptowoo' ), '<strong>', '</strong>.' ),
 				'desc'              => sprintf( __( 'Cross-calculated via BTC/%s', 'cryptowoo' ), $woocommerce_currency ),
 				'options'           => array(
-					'poloniex' => 'Poloniex',
-					'bittrex'  => 'Bittrex',
+					'coingecko' => 'CoinGecko',
+					'poloniex'  => 'Poloniex',
+					'bittrex'   => 'Bittrex',
 				),
 				'default'           => 'poloniex',
 				'ajax_save'         => false, // Force page load when this changes.
