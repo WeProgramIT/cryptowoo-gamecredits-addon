@@ -17,12 +17,12 @@ To get updates directly in Wordpress admin panel, you need [GitHub updater](http
 Download it here: https://github.com/afragen/github-updater/releases/latest
 
 # About Us
-This plugin was developed by [We Program IT](https://weprogram.it)
+This plugin was developed by [CryptoWoo](https://cryptowoo.com)
 
-Business name: We Program IT  
-Company name: OS IT Programming AS  
-Org. nr: 921 074 077  
+Business name: CryptoWoo  
+Company name: CryptoWoo AS  
+Org. nr: 927 185 792  
 Country: Norway  
 Company register: Foretaksregisteret
 
-Website: [https://weprogram.it](https://weprogram.it)
+Website: [https://cryptowoo.com](https://cryptowoo.com)
